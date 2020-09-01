@@ -32,7 +32,7 @@ import octoprint.plugin
 # 			self.is_running = False
 
 
-class Julia2020ExtendedABLTouchUI(octoprint.plugin.StartupPlugin):
+class Julia2020AdvancedABLTouchUI(octoprint.plugin.StartupPlugin):
     def on_after_startup(self):
         # self.resetInetrval = int(self._settings.get(["resetInetrval"]))
         self._logger.info("TouchUI Plugin Started")
@@ -57,28 +57,28 @@ class Julia2020ExtendedABLTouchUI(octoprint.plugin.StartupPlugin):
 
     def get_update_information(self):
         return dict(
-            Julia2020ExtendedABLTouchUI=dict(
-                displayName="Julia2020ExtendedABLTouchUI",
+            Julia2020AdvancedABLTouchUI=dict(
+                displayName="Julia2020AdvancedABLTouchUI",
                 displayVersion=self._plugin_version,
                 # version check: github repository
                 type="github_release",
                 user="FracktalWorks",
-                repo="Julia2020ExtendedABLTouchUI",
+                repo="Julia2020AdvancedABLTouchUI",
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/FracktalWorks/Julia2020ExtendedABLTouchUI/archive/{target_version}.zip"
+                pip="https://github.com/FracktalWorks/Julia2020AdvancedABLTouchUI/archive/{target_version}.zip"
             )
         )
 
 
-__plugin_name__ = "Julia Extended ABL Touch UI"
-__plugin_version__ = "1.0.2"
+__plugin_name__ = "Julia Advanced ABL Touch UI"
+__plugin_version__ = "0.0.1"
 
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = Julia2020ExtendedABLTouchUI()
+    __plugin_implementation__ = Julia2020AdvancedABLTouchUI()
 
     global __plugin_hooks__
     __plugin_hooks__ = {

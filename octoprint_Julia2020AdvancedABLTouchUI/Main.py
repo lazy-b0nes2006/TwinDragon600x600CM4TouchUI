@@ -259,10 +259,10 @@ class ClickableLineEdit(QtGui.QLineEdit):
         self.emit(QtCore.SIGNAL("clicked()"))
 
 
-class MainUiClass(QtGui.QMainWindow, mainGUI_extended_abl.Ui_MainWindow):
+class MainUiClass(QtGui.QMainWindow, mainGUI_advanced_abl.Ui_MainWindow):
     '''
     Main GUI Workhorse, all slots and events defined within
-    The main implementation class that inherits methods, variables etc from mainGUI_extended_abl.py and QMainWindow
+    The main implementation class that inherits methods, variables etc from mainGUI_advanced_abl.py and QMainWindow
     '''
 
     def setupUi(self, MainWindow):
@@ -1682,7 +1682,7 @@ class MainUiClass(QtGui.QMainWindow, mainGUI_extended_abl.Ui_MainWindow):
             os.system('sudo rm -rf /home/pi/.octoprint/users.yaml')
             os.system('sudo rm -rf /home/pi/.octoprint/printerProfiles/*')
             os.system('sudo rm -rf /home/pi/.octoprint/scripts/gcode')
-            os.system('sudo cp -f config/config_Julia2018ExtendedTouchUI.yaml /home/pi/.octoprint/config.yaml')
+            os.system('sudo cp -f config/config_Julia2020AdvancedABLTouchUI.yaml /home/pi/.octoprint/config.yaml')
             os.system('sudo rm -rf /home/pi/.fw_logo.dat')
             self.tellAndReboot("Settings restored. Rebooting...")
 
@@ -1720,7 +1720,7 @@ class MainUiClass(QtGui.QMainWindow, mainGUI_extended_abl.Ui_MainWindow):
             if dialog.WarningOk(self, "Network Disconnected"):
                 return
         self.QRCodeLabel.setPixmap(
-            qrcode.make(json.dumps(qrip), image_factory=Image).pixmap())
+            qrcode.make("http://"+ qrip, image_factory=Image).pixmap())
         self.stackedWidget.setCurrentWidget(self.QRCodePage)
 
 
