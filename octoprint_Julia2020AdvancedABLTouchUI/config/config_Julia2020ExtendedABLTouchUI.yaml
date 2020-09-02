@@ -4,7 +4,7 @@ api:
   enabled: true
   key: B508534ED20348F090B4D0AD637D3660
 appearance:
-  name: Julia Extended ABL
+  name: Julia Advanced ABL
 devel:
   cache:
     enabled: true
@@ -104,11 +104,11 @@ printerProfiles:
     name: Julia Extended ABL
     volume:
       custom_box: false
-      depth: 250.0
+      depth: 200.0
       formFactor: rectangular
-      height: 305.0
+      height: 210.0
       origin: lowerleft
-      width: 250.0
+      width: 200.0
 serial:
   autoconnect: true
   baudrate: 115200
