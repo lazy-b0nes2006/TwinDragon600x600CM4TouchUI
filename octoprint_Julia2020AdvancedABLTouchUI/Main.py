@@ -1717,7 +1717,7 @@ class MainUiClass(QtGui.QMainWindow, mainGUI_advanced_abl.Ui_MainWindow):
         elif getIP(ThreadRestartNetworking.WLAN) is not None:
             qrip = getIP(ThreadRestartNetworking.WLAN)
         else:
-            if dialog.WarningOk(self, "Network Disconnected"):mainGUI_extended_abl
+            if dialog.WarningOk(self, "Network Disconnected"):
                 return
         self.QRCodeLabel.setPixmap(
             qrcode.make("http://"+ qrip, image_factory=Image).pixmap())
