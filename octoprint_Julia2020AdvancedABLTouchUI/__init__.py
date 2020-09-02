@@ -73,7 +73,7 @@ class Julia2020AdvancedABLTouchUI(octoprint.plugin.StartupPlugin):
 
 
 __plugin_name__ = "Julia Advanced ABL Touch UI"
-__plugin_version__ = "1.0.0"
+__plugin_version__ = "1.0.1"
 
 
 def __plugin_load__():
