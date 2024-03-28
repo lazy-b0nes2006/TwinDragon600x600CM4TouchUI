@@ -107,10 +107,10 @@ filaments = [
 filaments = OrderedDict(filaments)
 
 #values before 2020 changes
-calibrationPosition = {'X1': 110, 'Y1': 18,
-                       'X2': 510, 'Y2': 18,
-                       'X3': 310, 'Y3': 308,
-                       'X4': 310, 'Y4': 178
+calibrationPosition = {'X1': 63, 'Y1': 67, #110, 18
+                       'X2': 542, 'Y2': 67, #510, 18
+                       'X3': 303, 'Y3': 567, #310, 308
+                       'X4': 303, 'Y4': 297 #310, 178
                        }
 
 # calibrationPosition = {'X1': 336, 'Y1': 33,
@@ -1450,10 +1450,10 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         if self.printerStatusText not in ["Printing","Paused"]:
             if self.activeExtruder == 1:
                 octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X655 Y-79 F10000")
+                octopiclient.gcode("G1 X648 Y-112 F10000")
             else:
                 octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X-30 Y-79 F10000")
+                octopiclient.gcode("G1 X-27 Y-112 F10000")
                 
         if self.changeFilamentComboBox.findText("Loaded Filament") == -1:
             octopiclient.setToolTemperature({"tool1": filaments[str(
@@ -1471,10 +1471,10 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         if self.printerStatusText not in ["Printing","Paused"]:
             if self.activeExtruder == 1:
                 octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X655 Y-79 F10000")
+                octopiclient.gcode("G1 X648 Y-112 F10000")
             else:
                 octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X-30 Y-79 F10000")
+                octopiclient.gcode("G1 X-27 Y-112 F10000")
 
         if self.changeFilamentComboBox.findText("Loaded Filament") == -1:
             octopiclient.setToolTemperature({"tool1": filaments[str(
@@ -2495,7 +2495,7 @@ class QtWebsocket(QtCore.QThread):
         if "current" in data:
             if data["current"]["messages"]:
                 for item in data["current"]["messages"]:
-                    if 'Filament Runout' in item: # "Filament Runout on T0/T1"
+                    if 'Filament Runout or clogged' in item: # "Filament Runout on T0/T1"
                         self.filament_sensor_triggered_signal.emit(item[item.index('T') + 1:].split(' ', 1)[0])
                     if 'M206' in item: #response to M503, send current Z offset value
                         self.z_home_offset_signal.emit(item[item.index('Z') + 1:].split(' ', 1)[0])
