@@ -91,17 +91,17 @@ apiKey = 'B508534ED20348F090B4D0AD637D3660'
 
 file_name = ''
 filaments = [
-                ("PLA", 220),
-                ("ABS", 240),
-                ("PETG", 240),
-                ("PVA", 230),
-                ("TPU", 240),
-                ("Nylon", 250),
-                ("PolyCarbonate", 265),
-                ("HIPS", 240),
+                ("PLA", 190),
+                ("ABS", 220),
+                ("PETG", 220),
+                ("PVA", 210),
+                ("TPU", 230),
+                ("Nylon", 240),
+                ("PolyCarbonate", 260),
+                ("HIPS", 220),
                 ("WoodFill", 220),
                 ("CopperFill", 200),
-                ("Breakaway", 240)
+                ("Breakaway", 220)
 ]
 
 filaments = OrderedDict(filaments)
@@ -113,11 +113,8 @@ calibrationPosition = {'X1': 63, 'Y1': 67, #110, 18
                        'X4': 303, 'Y4': 297 #310, 178
                        }
 
-# calibrationPosition = {'X1': 336, 'Y1': 33,
-#                        'X2': 27, 'Y2': 33,
-#                        'X3': 183, 'Y3': 343,
-#                        'X4': 183, 'Y4': 33
-#                        }
+tool0PurgePosition = {'X': -27, 'Y': -112}
+tool1PurgePosition = {'X': 648, 'Y': -112}
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -895,13 +892,13 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             if triggered_extruder0 and self.stackedWidget.currentWidget() not in [self.changeFilamentPage, self.changeFilamentProgressPage,
                                     self.changeFilamentExtrudePage, self.changeFilamentRetractPage,self.changeFilamentLoadPage]:
                 octopiclient.gcode(command='PAUSE')
-                if dialog.WarningOk(self, "Filament outage in Extruder 0. Print paused"):
+                if dialog.WarningOk(self, "Filament outage or clog detected in Extruder 0. Please check the external motors. Print paused"):
                     pass
 
             if triggered_extruder1 and self.stackedWidget.currentWidget() not in [self.changeFilamentPage, self.changeFilamentProgressPage,
                                     self.changeFilamentExtrudePage, self.changeFilamentRetractPage,self.changeFilamentLoadPage]:
                 octopiclient.gcode(command='PAUSE')
-                if dialog.WarningOk(self, "Filament outage in Extruder 1. Print paused"):
+                if dialog.WarningOk(self, "Filament outage or clog detected in Extruder 1. Please check the external motors. Print paused"):
                     pass
 
             # if triggered_door:
@@ -1449,11 +1446,10 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         #Update
         if self.printerStatusText not in ["Printing","Paused"]:
             if self.activeExtruder == 1:
-                octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X648 Y-112 F10000")
+                octopiclient.jog(tool1PurgePosition['X'],tool1PurgePosition["Y"] ,absolute=True, speed=10000)
+                
             else:
-                octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X-27 Y-112 F10000")
+                octopiclient.jog(tool0PurgePosition['X'],tool0PurgePosition["Y"] ,absolute=True, speed=10000)
                 
         if self.changeFilamentComboBox.findText("Loaded Filament") == -1:
             octopiclient.setToolTemperature({"tool1": filaments[str(
@@ -1470,11 +1466,10 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         #Update
         if self.printerStatusText not in ["Printing","Paused"]:
             if self.activeExtruder == 1:
-                octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X648 Y-112 F10000")
+                octopiclient.jog(tool1PurgePosition['X'],tool1PurgePosition["Y"] ,absolute=True, speed=10000)
+                
             else:
-                octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X-27 Y-112 F10000")
+                octopiclient.jog(tool0PurgePosition['X'],tool0PurgePosition["Y"] ,absolute=True, speed=10000)
 
         if self.changeFilamentComboBox.findText("Loaded Filament") == -1:
             octopiclient.setToolTemperature({"tool1": filaments[str(
@@ -1506,7 +1501,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         once filament is loaded, this function is called to extrude filament till the toolhead
         '''
         self.stackedWidget.setCurrentWidget(self.changeFilamentExtrudePage)
-        for i in range(5):
+        for i in range(9):
             octopiclient.gcode("G91")
             octopiclient.gcode("G1 E300 F1500")
             octopiclient.gcode("G90")
@@ -1526,12 +1521,12 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode("G91")
         octopiclient.gcode("G1 E20 F1000")
         time.sleep(self.calcExtrudeTime(20, 1000))
-        octopiclient.gcode("G1 E-20 F1000")
-        time.sleep(self.calcExtrudeTime(20, 1000))
-        octopiclient.gcode("G1 E-150 F500")
-        time.sleep(self.calcExtrudeTime(150, 500))
+        octopiclient.gcode("G1 E-20 F2400")
+        time.sleep(self.calcExtrudeTime(20, 2400))
+        octopiclient.gcode("G1 E-150 F1000")
+        time.sleep(self.calcExtrudeTime(150, 1000))
         octopiclient.gcode("G90")
-        for i in range(5):
+        for i in range(9):
             octopiclient.gcode("G91")
             octopiclient.gcode("G1 E-300 F1500")
             octopiclient.gcode("G90")
