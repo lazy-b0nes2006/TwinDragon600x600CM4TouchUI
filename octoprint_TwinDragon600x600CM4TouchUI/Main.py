@@ -1501,7 +1501,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         once filament is loaded, this function is called to extrude filament till the toolhead
         '''
         self.stackedWidget.setCurrentWidget(self.changeFilamentExtrudePage)
-        for i in range(9):
+        for i in range(8):
             octopiclient.gcode("G91")
             octopiclient.gcode("G1 E300 F1500")
             octopiclient.gcode("G90")
@@ -1526,7 +1526,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode("G1 E-150 F1000")
         time.sleep(self.calcExtrudeTime(150, 1000))
         octopiclient.gcode("G90")
-        for i in range(9):
+        for i in range(8):
             octopiclient.gcode("G91")
             octopiclient.gcode("G1 E-300 F1500")
             octopiclient.gcode("G90")
