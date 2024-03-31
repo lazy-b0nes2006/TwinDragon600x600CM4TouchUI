@@ -111,7 +111,7 @@ filaments = OrderedDict(filaments)
 calibrationPosition = {'X1': 63, 'Y1': 67, #110, 18
                        'X2': 542, 'Y2': 67, #510, 18
                        'X3': 303, 'Y3': 567, #310, 308
-                       'X4': 303, 'Y4': 297 #310, 178
+                       'X4': 303, 'Y4': 20
                        }
 
 tool0PurgePosition = {'X': -27, 'Y': -112}
@@ -576,6 +576,22 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.quickStep3CancelButton.pressed.connect(self.cancelStep)
         self.quickStep4CancelButton.pressed.connect(self.cancelStep)
         self.nozzleHeightStep1CancelButton.pressed.connect(self.cancelStep)
+
+        # --IDEX Caliberation Addition--
+
+        self.idexCalibrationWizardButton.clicked.connect(self.idexConfigStep1)
+        self.idexConfigStep1NextButton.clicked.connect(self.idexConfigStep2)
+        self.idexConfigStep2NextButton.clicked.connect(self.idexConfigStep3)
+        self.idexConfigStep3NextButton.clicked.connect(self.idexConfigStep4)
+        self.idexConfigStep4NextButton.clicked.connect(self.idexConfigStep5)
+        self.idexConfigStep5NextButton.clicked.connect(self.idexDoneStep)
+        self.idexConfigStep1CancelButton.pressed.connect(self.idexCancelStep)
+        self.idexConfigStep2CancelButton.pressed.connect(self.idexCancelStep)
+        self.idexConfigStep3CancelButton.pressed.connect(self.idexCancelStep)
+        self.idexConfigStep4CancelButton.pressed.connect(self.idexCancelStep)
+        self.idexConfigStep5CancelButton.pressed.connect(self.idexCancelStep)
+        self.moveZMIdexButton.pressed.connect(lambda: octopiclient.jog(z=-0.1))
+        self.moveZPIdexButton.pressed.connect(lambda: octopiclient.jog(z=0.1))
         
         self.toolOffsetXSetButton.pressed.connect(self.setToolOffsetX)
         self.toolOffsetYSetButton.pressed.connect(self.setToolOffsetY)
@@ -751,60 +767,6 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
 
         # Filament sensor toggle
         self.toggleFilamentSensorButton.clicked.connect(self.toggleFilamentSensor)
-
-        # # Lock settings
-        # self.pgLock_pin.textChanged.connect(self.Lock_onPinInputChanged)
-        #
-        # self.pgLock_bt1.clicked.connect(lambda: self.Lock_kbAdd("1"))
-        # self.pgLock_bt2.clicked.connect(lambda: self.Lock_kbAdd("2"))
-        # self.pgLock_bt3.clicked.connect(lambda: self.Lock_kbAdd("3"))
-        # self.pgLock_bt4.clicked.connect(lambda: self.Lock_kbAdd("4"))
-        # self.pgLock_bt5.clicked.connect(lambda: self.Lock_kbAdd("5"))
-        # self.pgLock_bt6.clicked.connect(lambda: self.Lock_kbAdd("6"))
-        # self.pgLock_bt7.clicked.connect(lambda: self.Lock_kbAdd("7"))
-        # self.pgLock_bt8.clicked.connect(lambda: self.Lock_kbAdd("8"))
-        # self.pgLock_bt9.clicked.connect(lambda: self.Lock_kbAdd("9"))
-        # self.pgLock_bt0.clicked.connect(lambda: self.Lock_kbAdd("0"))
-        # self.pgLock_btBackspace.clicked.connect(lambda: self.pgLock_pin.backspace())
-        # self.pgLock_btSubmit.clicked.connect(self.Lock_submitPIN)
-
-    # ''' +++++++++++++++++++++++++Lock Settings+++++++++++++++++++++++++++++++++++ '''
-    # def Lock_showLock(self):
-    #     self.pgLock_HID.setText(str(self.__packager.hc()))
-    #     self.pgLock_pin.setText("")
-    #     if not self.__timelapse_enabled:
-    #         # dialog.WarningOk(self, "Machine locked!")
-    #         self.stackedWidget.setCurrentWidget(self.pgLock)
-    #     else:
-    #         # if self.__timelapse_started:
-    #         #     dialog.WarningOk(self, "Demo mode!", overlay=True)
-    #         self.stackedWidget.setCurrentWidget(self.homePage)
-    #
-    # def Lock_kbAdd(self, txt):
-    #     if len(str(self.pgLock_pin.text())) < 9:
-    #         self.pgLock_pin.setText(str(self.pgLock_pin.text()) + txt)
-    #     self.pgLock_pin.setFocus()
-    #
-    # def Lock_onPinInputChanged(self):
-    #     self.pgLock_btBackspace.setEnabled(len(str(self.pgLock_pin.text())) > 0)
-    #     self.pgLock_btSubmit.setEnabled(len(str(self.pgLock_pin.text())) > 3)
-    #
-    # def Lock_submitPIN(self):
-    #     k = -1
-    #     t = self.pgLock_pin.text()
-    #     try:
-    #         k = int(t)
-    #         if self.__packager.match(k):
-    #             self.__packager.save(k)
-    #             # self.__timelapse_enabled = True
-    #             if dialog.SuccessOk(self, "Machine unlocked!", overlay=True):
-    #                 self.tellAndReboot()
-    #             self.stackedWidget.setCurrentWidget(self.homePage)
-    #         else:
-    #             dialog.WarningOk(self, "Incorrect unlock code")
-    #     except Exception as e:
-    #         dialog.WarningOk(self, "Error while parsing unlock code")
-    #         print(e.message)
 
     ''' +++++++++++++++++++++++++Print Restore+++++++++++++++++++++++++++++++++++ '''
 
@@ -2152,6 +2114,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode(command='M500')
 
     def getToolOffset(self, M218Data):
+
         #if float(M218Data[M218Data.index('X') + 1:].split(' ', 1)[0] ) > 0:
         self.toolOffsetZ = M218Data[M218Data.index('Z') + 1:].split(' ', 1)[0]
         self.toolOffsetX = M218Data[M218Data.index('X') + 1:].split(' ', 1)[0]
@@ -2159,6 +2122,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.toolOffsetXDoubleSpinBox.setValue(float(self.toolOffsetX))
         self.toolOffsetYDoubleSpinBox.setValue(float(self.toolOffsetY))
         self.toolOffsetZDoubleSpinBox.setValue(float(self.toolOffsetZ))
+        self.idexToolOffsetRestoreValue = float(self.toolOffsetZ)
 
 	
 
@@ -2297,6 +2261,88 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.uploadThread.start()
         if prnt:
             self.stackedWidget.setCurrentWidget(self.homePage)
+
+
+    ''' +++++++++++++++++++++++++++++++++++IDEX Config++++++++++++++++++++++++++++++++ '''
+
+
+    def idexConfigStep1(self):
+        '''
+        Shows welcome message.
+        Welcome Page, Give Info. Unlock nozzle and push down
+        :return:
+        '''
+        octopiclient.gcode(command='M503')  # Gets old tool offset position
+        octopiclient.gcode(command='M218 T1 Z0')  # set nozzle tool offsets to 0
+        octopiclient.gcode(command='M104 S200')
+        octopiclient.gcode(command='M104 T1 S200')
+        octopiclient.home(['x', 'y', 'z'])
+        octopiclient.gcode(command='G1 X10 Y10 Z20 F5000')
+        octopiclient.gcode(command='T0')  # Set active tool to t0
+        octopiclient.gcode(command='M420 S0')  # Dissable mesh bed leveling for good measure
+        self.stackedWidget.setCurrentWidget(self.idexConfigStep1Page)
+    def idexConfigStep2(self):
+        '''
+        levels first position (RIGHT)
+        :return:
+        '''
+        self.stackedWidget.setCurrentWidget(self.idexConfigStep2Page)
+        octopiclient.jog(x=calibrationPosition['X1'], y=calibrationPosition['Y1'], absolute=True, speed=10000)
+        octopiclient.jog(z=0, absolute=True, speed=1500)
+
+    def idexConfigStep3(self):
+        '''
+        levels second leveling position (LEFT)
+        '''
+        self.stackedWidget.setCurrentWidget(self.idexConfigStep3Page)
+        octopiclient.jog(z=10, absolute=True, speed=1500)
+        octopiclient.jog(x=calibrationPosition['X2'], y=calibrationPosition['Y2'], absolute=True, speed=10000)
+        octopiclient.jog(z=0, absolute=True, speed=1500)
+
+    def idexConfigStep4(self):
+        '''
+        Set to Mirror mode and asks to loosen the carriage, push both doen to max
+        :return:
+        '''
+        # sent twice for some reason
+        self.stackedWidget.setCurrentWidget(self.idexConfigStep4Page)
+        octopiclient.jog(z=10, absolute=True, speed=1500)
+        octopiclient.gcode(command='M605 S3')
+        octopiclient.jog(x=calibrationPosition['X1'], y=calibrationPosition['Y1'], absolute=True, speed=10000)
+
+    def idexConfigStep5(self):
+        '''
+        take bed up until both nozzles touch the bed. ASk to take nozzle up and down till nozzle just rests on the bed and tighten
+        :return:
+        '''
+        # sent twice for some reason
+        self.stackedWidget.setCurrentWidget(self.idexConfigStep5Page)
+        octopiclient.jog(z=1, absolute=True, speed=10000)
+
+
+    def idexDoneStep(self):
+        '''
+        Exits leveling
+        :return:
+        '''
+        octopiclient.jog(z=4, absolute=True, speed=1500)
+        self.stackedWidget.setCurrentWidget(self.calibratePage)
+        octopiclient.home(['z'])
+        octopiclient.home(['x', 'y'])
+        octopiclient.gcode(command='M104 S0')
+        octopiclient.gcode(command='M104 T1 S0')
+        octopiclient.gcode(command='M605 S1')
+        octopiclient.gcode(command='M218 T1 Z0') #set nozzle offsets to 0
+        octopiclient.gcode(command='M500')  # store eeprom settings to get Z home offset, mesh bed leveling back
+
+    def idexCancelStep(self):
+        self.stackedWidget.setCurrentWidget(self.calibratePage)
+        octopiclient.gcode(command='M605 S1')
+        octopiclient.home(['z'])
+        octopiclient.home(['x', 'y'])
+        octopiclient.gcode(command='M104 S0')
+        octopiclient.gcode(command='M104 T1 S0')
+        octopiclient.gcode(command='M218 T1 Z{}'.format(self.idexToolOffsetRestoreValue))
 
     ''' +++++++++++++++++++++++++++++++++++Keyboard++++++++++++++++++++++++++++++++ '''
 
