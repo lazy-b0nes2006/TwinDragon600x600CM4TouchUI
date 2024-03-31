@@ -117,7 +117,7 @@ calibrationPosition = {'X1': 63, 'Y1': 67, #110, 18
 tool0PurgePosition = {'X': -27, 'Y': -112}
 tool1PurgePosition = {'X': 648, 'Y': -112}
 
-ptfeTubeLength = 500
+ptfeTubeLength = 3000 #3000 for 600x600, 1500 for 600x300
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -1496,9 +1496,9 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.changeFilamentLoadPage)
         while self.stackedWidget.currentWidget() == self.changeFilamentLoadPage:
             octopiclient.gcode("G91")
-            octopiclient.gcode("G1 E15 F1000")
+            octopiclient.gcode("G1 E5 F500")
             octopiclient.gcode("G90")
-            time.sleep(1)
+            time.sleep(self.calcExtrudeTime(5, 500))
 
     @run_async
     def changeFilamentExtrudePageFunction(self):
@@ -1506,7 +1506,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         once filament is loaded, this function is called to extrude filament till the toolhead
         '''
         self.stackedWidget.setCurrentWidget(self.changeFilamentExtrudePage)
-        for i in range(8):
+        for i in range(int(ptfeTubeLength/300)):
             octopiclient.gcode("G91")
             octopiclient.gcode("G1 E300 F1500")
             octopiclient.gcode("G90")
