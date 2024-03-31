@@ -97,8 +97,8 @@ filaments = [
                 ("PETG", 220),
                 ("PVA", 210),
                 ("TPU", 230),
-                ("Nylon", 240),
-                ("PolyCarbonate", 260),
+                ("Nylon", 220),
+                ("PolyCarbonate", 240),
                 ("HIPS", 220),
                 ("WoodFill", 220),
                 ("CopperFill", 200),
@@ -117,7 +117,7 @@ calibrationPosition = {'X1': 63, 'Y1': 67, #110, 18
 tool0PurgePosition = {'X': -27, 'Y': -112}
 tool1PurgePosition = {'X': 648, 'Y': -112}
 
-ptfeTubeLength = 3000 #3000 for 600x600, 1500 for 600x300
+ptfeTubeLength = 2400 #2400 for 600x600, 1500 for 600x300 keep as multiples of 300 only
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -1523,15 +1523,17 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         Remove the filament from the toolhead
         '''
         self.stackedWidget.setCurrentWidget(self.changeFilamentRetractPage)
+        # Tip Shaping to prevent filament jamming in nozzle
         octopiclient.gcode("G91")
-        octopiclient.gcode("G1 E20 F1000")
-        time.sleep(self.calcExtrudeTime(20, 1000))
+        octopiclient.gcode("G1 E10 600")
+        time.sleep(self.calcExtrudeTime(10, 600))
         octopiclient.gcode("G1 E-20 F2400")
         time.sleep(self.calcExtrudeTime(20, 2400))
-        octopiclient.gcode("G1 E-150 F1000")
-        time.sleep(self.calcExtrudeTime(150, 1000))
+        time.sleep(15) #wait for filament to cool inside the nozzle
+        octopiclient.gcode("G1 E-150 F2400")
+        time.sleep(self.calcExtrudeTime(150, 2400))
         octopiclient.gcode("G90")
-        for i in range(8):
+        for i in range(int(ptfeTubeLength/300)):
             octopiclient.gcode("G91")
             octopiclient.gcode("G1 E-300 F1500")
             octopiclient.gcode("G90")
