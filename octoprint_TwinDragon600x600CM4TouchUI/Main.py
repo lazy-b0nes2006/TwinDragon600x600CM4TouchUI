@@ -1529,7 +1529,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         time.sleep(self.calcExtrudeTime(10, 600))
         octopiclient.gcode("G1 E-20 F2400")
         time.sleep(self.calcExtrudeTime(20, 2400))
-        time.sleep(15) #wait for filament to cool inside the nozzle
+        time.sleep(10) #wait for filament to cool inside the nozzle
         octopiclient.gcode("G1 E-150 F2400")
         time.sleep(self.calcExtrudeTime(150, 2400))
         octopiclient.gcode("G90")
@@ -1724,6 +1724,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         '''
         Prints the file selected from printSelected()
         '''
+        octopiclient.home(['x', 'y', 'z'])
         octopiclient.selectFile(self.fileListWidget.currentItem().text(), True)
         # octopiclient.startPrint()
         self.checkKlipperPrinterCFG()
