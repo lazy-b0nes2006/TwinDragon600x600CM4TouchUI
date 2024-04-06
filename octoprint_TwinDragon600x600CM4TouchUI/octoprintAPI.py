@@ -2,6 +2,7 @@ from contextlib import contextmanager
 import os
 import requests
 import json
+import base64
 
 '''
 ToDo:
@@ -173,7 +174,15 @@ class octoprintAPI:
         headers = {'X-Api-Key': self.apiKey}
         response = requests.get(url, headers=headers, stream=True)
         if response.status_code == 200:
-            return response.content
+            content = response.content
+            start = content.find(b'; thumbnail begin')
+            end = content.find(b'; thumbnail end')
+            if start != -1 and end != -1:
+                thumbnail = content[start:end]
+                thumbnail = base64.b64decode(thumbnail[thumbnail.find(b'\n')+1:].replace(b'; ', b'').replace(b'\r\n', b''))
+                return thumbnail
+            else:
+                return False
         else:
             return False
 

@@ -41,6 +41,7 @@ import requests
 import re
 import logging
 from collections import OrderedDict
+import base64
 
 #if not Development:
     #import RPi.GPIO as GPIO
@@ -1585,6 +1586,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.fileListWidgetUSB.addItems(files)
         self.fileListWidgetUSB.setCurrentRow(0)
 
+
     def printSelectedLocal(self):
 
         '''
@@ -1629,14 +1631,8 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             '''
             If image is available from server, set it, otherwise display default image
             '''
-            img = octopiclient.getImage(self.fileListWidget.currentItem().text().replace(".gcode", ".png"))
-            if img:
-                pixmap = QtGui.QPixmap()
-                pixmap.loadFromData(img)
-                self.printPreviewSelected.setPixmap(pixmap)
+            self.displayThumbnail(self.printPreviewSelected, str(self.fileListWidget.currentItem().text()), usb=False)
 
-            else:
-                self.printPreviewSelected.setPixmap(QtGui.QPixmap(_fromUtf8("templates/img/thumbnail.png")))
         except:
             print ("Log: Nothing Selected")
             # Set image fot print preview:
@@ -1654,16 +1650,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         try:
             self.fileSelectedUSBName.setText(self.fileListWidgetUSB.currentItem().text())
             self.stackedWidget.setCurrentWidget(self.printSelectedUSBPage)
-            file = '/media/usb0/' + str(self.fileListWidgetUSB.currentItem().text().replace(".gcode", ".png"))
-            try:
-                exists = os.path.exists(file)
-            except:
-                exists = False
-
-            if exists:
-                self.printPreviewSelectedUSB.setPixmap(QtGui.QPixmap(_fromUtf8(file)))
-            else:
-                self.printPreviewSelectedUSB.setPixmap(QtGui.QPixmap(_fromUtf8("templates/img/thumbnail.png")))
+            self.displayThumbnail(self.printPreviewSelectedUSB, '/media/usb0/' + str(self.fileListWidgetUSB.currentItem().text()), usb=True)
         except:
             print ("Log: Nothing Selected")
 
@@ -1699,9 +1686,46 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         '''
         octopiclient.deleteFile(self.fileListWidget.currentItem().text())
         octopiclient.deleteFile(self.fileListWidget.currentItem().text().replace(".gcode", ".png"))
-
         # delete PNG also
         self.fileListLocal()
+
+
+    def getImageFromGcode(self,gcodeLocation):
+        '''
+        Gets the image from the gcode text file
+        '''
+        with open(gcodeLocation, 'rb') as f:
+            content = f.readlines()[:500]
+            content = b''.join(content)
+        start = content.find(b'; thumbnail begin')
+        end = content.find(b'; thumbnail end')
+        if start != -1 and end != -1:
+            thumbnail = content[start:end]
+            thumbnail = base64.b64decode(thumbnail[thumbnail.find(b'\n') + 1:].replace(b'; ', b'').replace(b'\r\n', b''))
+            return thumbnail
+        else:
+            return False
+
+    @run_async
+    def displayThumbnail(self,labelObject,fileLocation, usb=False):
+        '''
+        Displays the image on the label object
+        :param labelObject: QLabel object to display the image
+        :param img: image to display
+        '''
+        try:
+            pixmap = QtGui.QPixmap()
+            if usb:
+                img = self.getImageFromGcode(fileLocation)
+            else:
+                img = octopiclient.getImage(fileLocation)
+            if img:
+                pixmap.loadFromData(img)
+                labelObject.setPixmap(pixmap)
+            else:
+                labelObject.setPixmap(QtGui.QPixmap(_fromUtf8("templates/img/thumbnail.png")))
+        except:
+            labelObject.setPixmap(QtGui.QPixmap(_fromUtf8("templates/img/thumbnail.png")))
 
     ''' +++++++++++++++++++++++++++++++++Printer Status+++++++++++++++++++++++++++++++ '''
 
@@ -1834,13 +1858,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             '''
             if self.currentImage != self.currentFile:
                 self.currentImage = self.currentFile
-                img = octopiclient.getImage(file['job']['file']['name'].replace(".gcode", ".png"))
-                if img:
-                    pixmap = QtGui.QPixmap()
-                    pixmap.loadFromData(img)
-                    self.printPreviewMain.setPixmap(pixmap)
-                else:
-                    self.printPreviewMain.setPixmap(QtGui.QPixmap(_fromUtf8("templates/img/thumbnail.png")))
+                self.displayThumbnail(self.printPreviewMain, self.currentFile, usb=False)
 
     def updateStatus(self, status):
         '''
