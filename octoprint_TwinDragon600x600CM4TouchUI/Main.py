@@ -2626,11 +2626,8 @@ class QtWebsocket(QtCore.QThread):
                         self.z_probe_offset_signal.emit(item[item.index('Z') + 1:].split(' ', 1)[0])
                     if 'PROBING_FAILED' in item:
                         self.z_probing_failed_signal.emit()
-                    if '!!' or 'Error' in item:
-                        if 'ok' not in item:
-                            print(item)
-                            self.printer_error_signal.emit(item)
-
+                    if item.startswith('!!') or item.startswith('Error'):
+                        self.printer_error_signal.emit(item)
             if data["current"]["state"]["text"]:
                 self.status_signal.emit(data["current"]["state"]["text"])
 
