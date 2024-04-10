@@ -530,6 +530,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.QtSocket.active_extruder_signal.connect(self.setActiveExtruder)
         self.QtSocket.z_probing_failed_signal.connect(self.showProbingFailed)
         self.QtSocket.tool_offset_signal.connect(self.getToolOffset)
+        self.QtSocket.printer_error_signal.connect(self.showPrinterError)
 
         # Text Input events
         self.wifiPasswordLineEdit.clicked_signal.connect(lambda: self.startKeyboard(self.wifiPasswordLineEdit.setText))
@@ -2067,8 +2068,17 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         except Exception as e:
                     print("error: " + str(e))
 
-    def showProbingFailed(self):
-        self.tellAndReboot("Bed position is not calibrated. Please run calibration wizard after restart.")
+    def showProbingFailed(self,msg='Probing Failed, Calibrate bed again or check for hardware issue',overlay=True):
+        if dialog.WarningOk(self, msg, overlay=overlay):
+            octopiclient.cancelPrint()
+            return True
+        return False
+
+    def showPrinterError(self,msg='Printer error, Check Terminal',overlay=True):
+        if dialog.WarningOk(self, msg, overlay=overlay):
+            pass
+            return True
+        return False
 
     def updateEEPROMProbeOffset(self, offset):
         '''
@@ -2509,6 +2519,7 @@ class QtWebsocket(QtCore.QThread):
     active_extruder_signal = QtCore.pyqtSignal(str)
     z_probe_offset_signal = QtCore.pyqtSignal(str)
     z_probing_failed_signal = QtCore.pyqtSignal()
+    printer_error_signal = QtCore.pyqtSignal(str)
 
     def __init__(self):
 
@@ -2615,6 +2626,10 @@ class QtWebsocket(QtCore.QThread):
                         self.z_probe_offset_signal.emit(item[item.index('Z') + 1:].split(' ', 1)[0])
                     if 'PROBING_FAILED' in item:
                         self.z_probing_failed_signal.emit()
+                    if '!!' or 'Error' in item:
+                        if 'ok' not in item:
+                            print(item)
+                            self.printer_error_signal.emit(item)
 
             if data["current"]["state"]["text"]:
                 self.status_signal.emit(data["current"]["state"]["text"])
