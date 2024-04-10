@@ -2232,6 +2232,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.home(['x', 'y', 'z'])
         octopiclient.gcode(command='M104 S0')
         octopiclient.gcode(command='M104 T1 S0')
+        octopiclient.gcode(command='M84')
         octopiclient.gcode(command='M500')  # store eeprom settings to get Z home offset, mesh bed leveling back
 
     def cancelStep(self):
@@ -2239,6 +2240,8 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.home(['x', 'y', 'z'])
         octopiclient.gcode(command='M104 S0')
         octopiclient.gcode(command='M104 T1 S0')
+        octopiclient.gcode(command='M84')
+
     
     def testPrint(self,tool0Diameter,tool1Diameter,gcode):
         '''
@@ -2351,6 +2354,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode(command='M104 T1 S0')
         octopiclient.gcode(command='M605 S1')
         octopiclient.gcode(command='M218 T1 Z0') #set nozzle offsets to 0
+        octopiclient.gcode(command='M84')
         octopiclient.gcode(command='M500')  # store eeprom settings to get Z home offset, mesh bed leveling back
 
     def idexCancelStep(self):
@@ -2361,6 +2365,8 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode(command='M104 S0')
         octopiclient.gcode(command='M104 T1 S0')
         octopiclient.gcode(command='M218 T1 Z{}'.format(self.idexToolOffsetRestoreValue))
+        octopiclient.gcode(command='M84')
+
 
     ''' +++++++++++++++++++++++++++++++++++Keyboard++++++++++++++++++++++++++++++++ '''
 
