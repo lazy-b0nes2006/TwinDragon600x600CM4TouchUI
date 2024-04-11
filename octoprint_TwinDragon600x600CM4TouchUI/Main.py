@@ -1470,11 +1470,13 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         once filament is loaded, this function is called to extrude filament till the toolhead
         '''
         self.stackedWidget.setCurrentWidget(self.changeFilamentExtrudePage)
-        for i in range(int(ptfeTubeLength/300)):
+        for i in range(int(ptfeTubeLength/150)):
             octopiclient.gcode("G91")
-            octopiclient.gcode("G1 E300 F1500")
+            octopiclient.gcode("G1 E150 F1500")
             octopiclient.gcode("G90")
-            time.sleep(self.calcExtrudeTime(300, 1500))
+            time.sleep(self.calcExtrudeTime(150, 1500))
+            if self.stackedWidget.currentWidget() is not self.changeFilamentExtrudePage:
+                break
 
         while self.stackedWidget.currentWidget() == self.changeFilamentExtrudePage:
             octopiclient.gcode("G91")
@@ -1497,11 +1499,13 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode("G1 E-150 F2400")
         time.sleep(self.calcExtrudeTime(150, 2400))
         octopiclient.gcode("G90")
-        for i in range(int(ptfeTubeLength/300)):
+        for i in range(int(ptfeTubeLength/150)):
             octopiclient.gcode("G91")
-            octopiclient.gcode("G1 E-300 F1500")
+            octopiclient.gcode("G1 E-150 F1500")
             octopiclient.gcode("G90")
-            time.sleep(self.calcExtrudeTime(300, 1500))
+            time.sleep(self.calcExtrudeTime(150, 1500))
+            if self.stackedWidget.currentWidget() is not self.changeFilamentRetractPage:
+                break
 											
         while self.stackedWidget.currentWidget() == self.changeFilamentRetractPage:
             octopiclient.gcode("G91")
