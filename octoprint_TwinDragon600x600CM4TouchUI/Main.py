@@ -1491,7 +1491,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.changeFilamentRetractPage)
         # Tip Shaping to prevent filament jamming in nozzle
         octopiclient.gcode("G91")
-        octopiclient.gcode("G1 E10 600")
+        octopiclient.gcode("G1 E10 F600")
         time.sleep(self.calcExtrudeTime(10, 600))
         octopiclient.gcode("G1 E-20 F2400")
         time.sleep(self.calcExtrudeTime(20, 2400))
@@ -2078,7 +2078,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             return True
         return False
 
-    def showPrinterError(self,msg='Printer error, Check Terminal',overlay=True):
+    def showPrinterError(self,msg='Printer error, Check Terminal',overlay=False): #True
         if dialog.WarningOk(self, msg, overlay=overlay):
             pass
             return True
@@ -2630,8 +2630,41 @@ class QtWebsocket(QtCore.QThread):
                         self.z_probe_offset_signal.emit(item[item.index('Z') + 1:].split(' ', 1)[0])
                     if 'PROBING_FAILED' in item:
                         self.z_probing_failed_signal.emit()
-                    if item.startswith('!!') or item.startswith('Error'):
-                        self.printer_error_signal.emit(item)
+                    
+                    items_to_ignore = [
+                        #"Error",
+                        "!! Printer is not ready",
+                        "!! Move out of range:"#,
+                        # "ok",
+                        # "B:",
+                        # "N",
+                        # "echo: "
+                    ]
+                    # if item.startswith('!!') or (item.startswith('Error') and not item.startswith('!! Printer is not ready')):
+                    #     self.printer_error_signal.emit(item)
+                    #     print(item)
+                    if item.strip():
+                        for ignore_item in items_to_ignore:
+                           if ignore_item in item:
+                               print("ignored ->" + ignore_item)
+                               # Ignore this item
+                               break
+                        else:
+                           if item.startswith('!!') or item.startswith('Error'):
+                           # If none of the items to ignore were found in 'item'
+                            self.printer_error_signal.emit(item)
+                            print(item)
+                    #items_to_ignore_pattern = re.compile(r'^(?!ok$|!! Printer is not ready$|!! Move out of range:$ ).*|^Error.*')
+                    # items_to_ignore_pattern = re.compile(r'(^Error)|(^!! Printer is not ready$)|(^!! Move out of range: .*$)|(ok)|(echo: )')
+                    # if not items_to_ignore_pattern.search(item):
+                    #     self.printer_error_signal.emit(item)
+                    #     print('Called ->'+ item + '<-')
+
+                    #items_to_ignore = ['!! Printer is not ready', '!! Move out of range:']
+                    #if item.startswith('!!') or (item.startswith('Error') and item not in items_to_ignore):
+                    #    self.printer_error_signal.emit(item)
+                    #if item.startswith('!!') or item.startswith('Error'):
+                    #    self.printer_error_signal.emit(item)
             if data["current"]["state"]["text"]:
                 self.status_signal.emit(data["current"]["state"]["text"])
 
