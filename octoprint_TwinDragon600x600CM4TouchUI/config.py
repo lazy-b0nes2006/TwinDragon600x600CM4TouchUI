@@ -39,7 +39,7 @@ Testing:
 
 Development = False      # set to True if running on any system other than RaspberryPi
 
-ip = '0.0.0.0:5000'
+ip = '192.168.0.20'
 apiKey = 'B508534ED20348F090B4D0AD637D3660'
 
 file_name = ''
