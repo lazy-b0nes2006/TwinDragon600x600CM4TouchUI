@@ -1,5 +1,12 @@
 from PyQt5 import QtCore
 from decorators import run_async
+from config import ip, apiKey
+
+import random
+import uuid
+import websocket
+import requests
+import json
 
 class QtWebsocket(QtCore.QThread):
     '''

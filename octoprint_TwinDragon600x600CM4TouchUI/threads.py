@@ -2,8 +2,10 @@ import os
 import time
 import subprocess
 from PyQt5 import QtCore
-from config import Development  
+from config import Development, ip, apiKey
+from network_utils import getIP  
 from octoprintAPI import octoprintAPI 
+
 
 class ThreadSanityCheck(QtCore.QThread):
 

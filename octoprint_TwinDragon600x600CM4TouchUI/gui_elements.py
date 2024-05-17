@@ -6,13 +6,26 @@ import logging
 import os
 import subprocess
 import time
+
+import mainGUI
+import keyboard
+import dialog
+import styles
+import glob
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 import mainGUI  # Ensure this is available in your Python path
 from decorators import run_async  # Ensure this is available in your Python path
 from config import Development 
 from hurry.filesize import size
 from datetime import datetime
-import json
+
+from config import *
+from config import _fromUtf8
+from threads import *
+from socket_qt import QtWebsocket
+from network_utils import *
+import base64
 
 class Image(qrcode.image.base.BaseImage):
     def __init__(self, border, width, box_size):

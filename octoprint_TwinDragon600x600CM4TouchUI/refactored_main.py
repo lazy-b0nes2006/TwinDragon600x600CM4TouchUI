@@ -8,13 +8,6 @@ from gui_elements import *
 from threads import *
 from socket_qt import *
 
-import mainGUI
-import keyboard
-import dialog
-import styles
-import asset_bundle
-import glob
-
 
 #if not Development:
     #import RPi.GPIO as GPIO
