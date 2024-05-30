@@ -12,8 +12,7 @@ def getIP(interface):
         mtIp = re.search(rInetAddr, scan_result)
         if not(mt6Ip) and mtIp and len(mtIp.groups()) == 1:
             return str(mtIp.group(1))
-    except Exception as e:
-        print(e)
+    except:
         return None
 
 def getMac(interface):
@@ -29,7 +28,7 @@ def getMac(interface):
 
 def getWifiAp():
     try:
-        ap = subprocess.Popen("iwgetid -r",
+        ap = subprocess.Popen("iwgetid -r", 
                               stdout=subprocess.PIPE, shell=True).communicate()[0].rstrip()
         if not ap:
             return "Not connected"

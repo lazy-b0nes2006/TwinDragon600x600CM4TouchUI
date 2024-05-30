@@ -1,6 +1,8 @@
 from PyQt5 import QtCore
 from collections import OrderedDict
 
+Development = True   # set to True if running on any system other than RaspberryPi
+
 # TODO:
 '''
 # Remove SD card capability from octoprint settings
@@ -37,39 +39,29 @@ Testing:
 # dissable buttons while printing
 '''
 
-Development = False      # set to True if running on any system other than RaspberryPi
-
-ip = '0.0.0.0:5000'
+ip = '192.168.0.20'
 apiKey = 'B508534ED20348F090B4D0AD637D3660'
-
 file_name = ''
 filaments = [
-                ("PLA", 190),
-                ("ABS", 220),
-                ("PETG", 220),
-                ("PVA", 210),
-                ("TPU", 230),
-                ("Nylon", 220),
-                ("PolyCarbonate", 240),
-                ("HIPS", 220),
+                ("PLA", 220),
+                ("ABS", 240),
+                ("PETG", 240),
+                ("PVA", 230),
+                ("TPU", 240),
+                ("Nylon", 250),
+                ("PolyCarbonate", 265),
+                ("HIPS", 240),
                 ("WoodFill", 220),
                 ("CopperFill", 200),
-                ("Breakaway", 220)
+                ("Breakaway", 240)
 ]
 
 filaments = OrderedDict(filaments)
 
-#values before 2020 changes
-calibrationPosition = {'X1': 63, 'Y1': 67, #110, 18
-                       'X2': 542, 'Y2': 67, #510, 18
-                       'X3': 303, 'Y3': 567, #310, 308
-                       'X4': 303, 'Y4': 20
+calibrationPosition = {'X1': 42, 'Y1': 21,
+                       'X2': 174, 'Y2': 21,
+                       'X3': 108, 'Y3': 195
                        }
-
-tool0PurgePosition = {'X': -27, 'Y': -112}
-tool1PurgePosition = {'X': 648, 'Y': -112}
-
-ptfeTubeLength = 2400 #2400 for 600x600, 1500 for 600x300 keep as multiples of 300 only
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

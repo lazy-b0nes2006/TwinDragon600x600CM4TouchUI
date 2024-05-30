@@ -1,7 +1,10 @@
-from config import Development
-import RPi.GPIO as GPIO
-from decorators import run_async
+from MainUIClass.decorators import run_async
 import time
+from MainUIClass.config import Development
+
+if not Development:
+    import RPi.GPIO as GPIO
+
 
 class BuzzerFeedback(object):
     def __init__(self, buzzerPin):
@@ -21,6 +24,7 @@ class BuzzerFeedback(object):
         pass
 
 buzzer = BuzzerFeedback(12)
+
 
 
 
